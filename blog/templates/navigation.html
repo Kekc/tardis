@@ -1,0 +1,8 @@
+<div class="container">
+{% for item in items %}
+	<span>
+		<a href="{{ item.link }}">{{ item.name }}</a>
+	</span>
+{% endfor %}
+	<input type="text" name="search">
+</div>
