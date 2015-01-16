@@ -1,0 +1,15 @@
+<html>
+<head>
+	<title>
+		Tardis
+	</title>
+
+	{% load staticfiles %}
+	<link rel="stylesheet" type="text/css" href="{% static 'index.css' %}" />
+</head>
+<body>
+{% for category in categories %}
+	<p class="category">{{ category }}</p>
+{% endfor %}
+</body>
+</html>
