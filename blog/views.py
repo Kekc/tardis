@@ -8,6 +8,6 @@ from blog.models import Category
 
 class CategoryListView(ListView):
     model = Category
-    template_name = 'index.html'
+    template_name = 'main.html'
     context_object_name = 'categories'
 
