@@ -1,15 +1,22 @@
-<html>
-<head>
-	<title>
-		Tardis
-	</title>
-
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Tardis - {% block title %}{% endblock %}</title>
 	{% load staticfiles %}
-	<link rel="stylesheet" type="text/css" href="{% static 'index.css' %}" />
-</head>
-<body>
-{% for category in categories %}
-	<p class="category">{{ category }}</p>
-{% endfor %}
-</body>
+	<link rel="stylesheet" type="text/css" href="{% static 'css/bootstrap.min.css' %}" />
+
+  </head>
+  <body>
+
+
+
+  </body>
+
+	<!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <script src="https://code.jquery.com/jquery-1.11.2.min.js"></script>
+    <!-- Include all compiled plugins (below), or include individual files as needed -->
+    <script src="{% static 'js/bootstrap.min.js' %}"></script>
 </html>
