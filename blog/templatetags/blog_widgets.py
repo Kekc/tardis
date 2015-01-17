@@ -26,7 +26,7 @@ def navigation(context):
     }
     newpost_item = {
         'name': 'add post',
-        'link': 'index',
+        'link': reverse('add_post'),
     }
     items = [home_item]
     if request.user.is_authenticated():
@@ -45,5 +45,5 @@ def post_template(context, post_id):
         post = Post.objects.get(pk=post_id)
     except Post.DoesNotExist:
         post = None
-
-    return {'post': post}
+    edit_flag = request.user == post.author or request.user.is_superuser
+    return {'post': post, 'edit_flag': edit_flag}

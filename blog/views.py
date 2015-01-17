@@ -45,6 +45,28 @@ class AuthorView(ListView):
         return context
 
 
+class PostCreateView(CreateView):
+    model = Post
+    fields = ['title', 'text', 'categories']
+    template_name = 'post_form.html'
+
+    def get_success_url(self):
+        return reverse('index')
+
+    def form_valid(self, form):
+        form.instance.author = self.request.user
+        return super(PostCreateView, self).form_valid(form)
+
+
+class PostEditView(UpdateView):
+    model = Post
+    fields = ['title', 'text', 'categories']
+    template_name = 'post_form.html'
+
+    def get_success_url(self):
+        return reverse('index')
+
+
 def registration(request):
     if request.method == 'POST':
         form = RegistrationForm(request.POST)

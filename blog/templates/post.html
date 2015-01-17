@@ -13,5 +13,8 @@
 	<div>
 		<span><a href="{% url 'author' post.author.id %}">{{ post.author }}</a></span>
 		<span>{{ post.created|date:"d-m-Y H:i:s" }}</span>
+		{% if edit_flag %}
+			<span><a href="{% url 'edit_post' post.id %}">edit</a></span>
+		{% endif %}
 	</div>
 </div>
