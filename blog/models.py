@@ -14,16 +14,13 @@ class Category(models.Model):
         return self.name
 
 
-class Entry(models.Model):
-    title = models.CharField(u'Blog entry title', max_length=255)
-    text = models.TextField(u'Blog entry text')
+class Post(models.Model):
+    title = models.CharField(u'Blog post title', max_length=255)
+    text = models.TextField(u'Blog post text')
     author = models.ForeignKey(User, verbose_name=u'Author')
     categories = models.ManyToManyField(Category, blank=True, null=True, verbose_name=u'Categories')
     created = models.DateTimeField(u'Created at', auto_now_add=True)
     edited = models.DateTimeField(u'Edited at', auto_now=True)
-
-    class Meta:
-        verbose_name_plural = u'Entries'
 
     def __unicode__(self):
         return '{0}, {1}'.format(self.author.username, self.created.strftime('%Y-%m-%d %H:%M:%S'))

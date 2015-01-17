@@ -1,5 +1,12 @@
 {% extends "index.html" %}
-
+{% load blog_widgets %}
 {% block title %}
 home
 {% endblock title %}
+
+{% block content %}
+	{% for post in posts %}
+		{% post_template post.id %}
+	{% endfor %}
+
+{% endblock content %}
