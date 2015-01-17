@@ -3,15 +3,26 @@
 import json
 
 from django.shortcuts import render, get_object_or_404
-from django.http import HttpResponse, HttpResponseRedirect, Http404, JsonResponse
+from django.http import HttpResponseRedirect, Http404, JsonResponse
 from django.core.urlresolvers import reverse
-from django.views.generic.edit import CreateView, UpdateView, DeleteView
+from django.views.generic.edit import CreateView, UpdateView
 from django.views.generic import ListView
 from django.contrib import auth
 from django.db.models import Q
+from django.contrib.auth.decorators import login_required
+from django.utils.decorators import method_decorator
+
 
 from blog.models import Category, Post, User
 from blog.forms import RegistrationForm, LoginForm
+
+
+class LoginRequiredMixin(object):
+    u"""Ensures that user must be authenticated in order to access view."""
+
+    @method_decorator(login_required)
+    def dispatch(self, *args, **kwargs):
+        return super(LoginRequiredMixin, self).dispatch(*args, **kwargs)
 
 
 class JSONResponseMixin(object):
@@ -70,11 +81,11 @@ class IndexView(JSONResponseMixin, ListView):
         })
         return context
 
-    def render_to_response(self, context):
+    def render_to_response(self, context, **response_kwargs):
         if self.request.is_ajax():
             return self.render_to_json_response(context, self.request.user)
         else:
-            return super(IndexView, self).render_to_response(context)
+            return super(IndexView, self).render_to_response(context, **response_kwargs)
 
 
 class CategoryView(JSONResponseMixin, ListView):
@@ -100,11 +111,11 @@ class CategoryView(JSONResponseMixin, ListView):
         })
         return context
 
-    def render_to_response(self, context):
+    def render_to_response(self, context, **response_kwargs):
         if self.request.is_ajax():
             return self.render_to_json_response(context, self.request.user)
         else:
-            return super(CategoryView, self).render_to_response(context)
+            return super(CategoryView, self).render_to_response(context, **response_kwargs)
 
 
 class AuthorView(JSONResponseMixin, ListView):
@@ -130,11 +141,11 @@ class AuthorView(JSONResponseMixin, ListView):
         })
         return context
 
-    def render_to_response(self, context):
+    def render_to_response(self, context, **response_kwargs):
         if self.request.is_ajax():
             return self.render_to_json_response(context, self.request.user)
         else:
-            return super(AuthorView, self).render_to_response(context)
+            return super(AuthorView, self).render_to_response(context, **response_kwargs)
 
 
 class SearchView(JSONResponseMixin, ListView):
@@ -169,14 +180,14 @@ class SearchView(JSONResponseMixin, ListView):
         })
         return context
 
-    def render_to_response(self, context):
+    def render_to_response(self, context, **response_kwargs):
         if self.request.is_ajax():
             return self.render_to_json_response(context, self.request.user)
         else:
-            return super(SearchView, self).render_to_response(context)
+            return super(SearchView, self).render_to_response(context, **response_kwargs)
 
 
-class PostCreateView(CreateView):
+class PostCreateView(LoginRequiredMixin, CreateView):
     model = Post
     fields = ['title', 'text', 'categories']
     template_name = 'post_form.html'
@@ -189,7 +200,7 @@ class PostCreateView(CreateView):
         return super(PostCreateView, self).form_valid(form)
 
 
-class PostEditView(UpdateView):
+class PostEditView(LoginRequiredMixin, UpdateView):
     model = Post
     fields = ['title', 'text', 'categories']
     template_name = 'post_form.html'
@@ -197,8 +208,16 @@ class PostEditView(UpdateView):
     def get_success_url(self):
         return reverse('index')
 
+    def render_to_response(self, context, **response_kwargs):
+        if context['post'].author == self.request.user:
+            return super(PostEditView, self).render_to_response(context, **response_kwargs)
+        else:
+            return render(self.request, 'access_error.html', {})
+
 
 def registration(request):
+    if request.user.is_authenticated():
+        return HttpResponseRedirect(reverse('index'))
     if request.method == 'POST':
         form = RegistrationForm(request.POST)
         if form.is_valid():
@@ -217,6 +236,8 @@ def registration(request):
 
 
 def login(request):
+    if request.user.is_authenticated():
+        return HttpResponseRedirect(reverse('index'))
     if request.method == 'POST':
         form = LoginForm(request.POST)
         if form.is_valid():
