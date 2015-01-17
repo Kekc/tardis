@@ -5,4 +5,8 @@
 	</span>
 {% endfor %}
 	<input type="text" name="search">
+	{% if user %}
+		<span>{{ user }}</span>
+		<a href="{% url 'logout' %}">logout</a>
+	{% endif %}
 </div>
