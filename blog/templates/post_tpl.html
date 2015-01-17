@@ -1,23 +1,31 @@
 {% verbatim %}
 	<script id="post_tpl" type="text/x-handlebars-template">
-		<div>
-			<div>
-				{{title}}
+		<div class="panel panel-default">
+			<div class="panel-heading">
+				<h3 class="panel-title">
+					{{title}}
+					{{#if edit_flag}}
+						<span class="pull-right"><a href="{{edit_url}}">edit</a></span>
+					{{/if}}
+				</h3>
 			</div>
-			<div>
+			<div class="panel-body">
 				{{text}}
 			</div>
-			<div>
-				{{#each categories}}
-					<a href="{{this.url}}">{{this.name}}</a>
-				{{/each}}
-			</div>
-			<div>
-				<span><a href="{{author_url}}">{{author_name}}</a></span>
-				<span>{{created}}</span>
-				{{#if edit_flag}}
-					<span><a href="{{edit_url}}">edit</a></span>
-				{{/if}}
+			<div class="panel-footer">
+				<div class="row">
+					<div class="col-md-2">Author: <a href="{{author_url}}">{{author_name}}</a></div>
+					{{#if categories}}
+						<div class="col-md-6">Categories:
+							{{#each categories}}
+								<span>
+									<a href="{{this.url}}">{{this.name}}</a>
+								</span>
+							{{/each}}
+						</div>
+					{{/if}}
+					<div class="col-md-3 pull-right">posted at: {{created}}</div>
+				</div>
 			</div>
 		</div>
 	</script>

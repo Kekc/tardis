@@ -13,25 +13,25 @@ def navigation(context):
     request = context['request']
     data = {}
     home_item = {
-        'name': 'home',
+        'name': 'Home',
         'link': reverse('index'),
     }
     signup_item = {
-        'name': 'sign up',
+        'name': 'Sign up',
         'link': reverse('registration'),
     }
     signin_item = {
-        'name': 'sign in',
+        'name': 'Sign in',
         'link': reverse('login'),
     }
     newpost_item = {
-        'name': 'add post',
+        'name': 'Add post',
         'link': reverse('add_post'),
     }
     items = [home_item]
     if request.user.is_authenticated():
         items.append(newpost_item)
-        data['user'] = request.user.username
+        data['user'] = request.user
     else:
         items.extend([signup_item, signin_item])
     data['items'] = items

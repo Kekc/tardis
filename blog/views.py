@@ -50,6 +50,7 @@ class JSONResponseMixin(object):
             'edit_url': reverse('edit_post', args=(item.id,)),
             'edit_flag': user == item.author or user.is_superuser,
             'categories': [{'url': reverse('category', args=(category.id,)), 'name': category.name} for category in item.categories.all()],
+            'created': item.created.strftime('%Y-%m-%d %H:%M:%S'),
 
         } for item in items]
         data = {

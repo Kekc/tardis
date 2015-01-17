@@ -1,20 +1,31 @@
-<div>
-	<div>
-		{{ post.title }}
+<div class="panel panel-default">
+	<div class="panel-heading">
+		<h3 class="panel-title">
+			{{ post.title }}
+			{% if edit_flag %}
+				<span class="pull-right"><a href="{% url 'edit_post' post.id %}">edit</a></span>
+			{% endif %}
+		</h3>
 	</div>
-	<div>
+	<div class="panel-body">
 		{{ post.text }}
 	</div>
-	<div>
-		{% for category in post.categories.all %}
-			<a href="{% url 'category' category.id %}">{{ category.name }}</a>
-		{% endfor %}
-	</div>
-	<div>
-		<span><a href="{% url 'author' post.author.id %}">{{ post.author }}</a></span>
-		<span>{{ post.created|date:"d-m-Y H:i:s" }}</span>
-		{% if edit_flag %}
-			<span><a href="{% url 'edit_post' post.id %}">edit</a></span>
-		{% endif %}
+	<div class="panel-footer">
+		<div class="row">
+			<div class="col-md-2">Author: <a href="{% url 'author' post.author.id %}">{{ post.author }}</a></div>
+			{% if post.categories.all %}
+
+				<div class="col-md-6">Categories:
+
+						{% for category in post.categories.all %}
+							<span>
+								<a href="{% url 'category' category.id %}">{{ category.name }}</a>
+							</span>
+						{% endfor %}
+				</div>
+			{% endif %}
+			<div class="col-md-3 pull-right">posted at: {{ post.created|date:"d-m-Y H:i:s" }}</div>
+
+		</div>
 	</div>
 </div>

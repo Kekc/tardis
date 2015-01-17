@@ -8,18 +8,20 @@ home
 {% endblock current_page %}
 
 {% block content %}
-	{% if posts %}
-		<div class="posts">
-			{% include "post_tpl.html" %}
-			{% for post in posts %}
-				{% post_template post.id %}
-			{% endfor %}
-		</div>
-		{% if load_flag %}
-			<span id="post-load-button" class="btn btn-primary" data-offset="0" onclick="load_posts({{ ajax_data }});">more</span>
-		{% endif %}
+	<div class="">
+		{% if posts %}
+			<div class="posts">
+				{% include "post_tpl.html" %}
+				{% for post in posts %}
+					{% post_template post.id %}
+				{% endfor %}
+			</div>
+			{% if load_flag %}
+				<span id="post-load-button" class="btn btn-default pull-right" data-offset="0" onclick="load_posts({{ ajax_data }});">more</span>
+			{% endif %}
 
-	{% else %}
-		<div class="container">No posts</div>
-	{% endif %}
+		{% else %}
+			<div class="">No posts</div>
+		{% endif %}
+	</div>
 {% endblock content %}

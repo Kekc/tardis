@@ -23,4 +23,4 @@ class Post(models.Model):
     edited = models.DateTimeField(u'Edited at', auto_now=True)
 
     def __unicode__(self):
-        return '{0}, {1}'.format(self.author.username, self.created.strftime('%Y-%m-%d %H:%M:%S'))
+        return '{0}, {1}'.format(self.author.username, self.title)

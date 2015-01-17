@@ -9,21 +9,22 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Tardis - {% block title %}{% endblock %}</title>
 	<link rel="stylesheet" type="text/css" href="{% static 'css/bootstrap.min.css' %}" />
+	<link rel="stylesheet" type="text/css" href="{% static 'css/blog.css' %}" />
 
   </head>
   <body>
-  {% block navigation_menu %}
-    {% navigation %}
-  {% endblock navigation_menu %}
+  <div class="container">
+    {% block navigation_menu %}
+      {% navigation %}
+    {% endblock navigation_menu %}
 
-  {% block current_page %}
-  {% endblock current_page %}
+    {% block current_page %}
+    {% endblock current_page %}
 
-  {% block content %}
+    {% block content %}
+    {% endblock content %}
 
-  {% endblock content %}
-
-
+  </div>
   </body>
 
 	<!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
