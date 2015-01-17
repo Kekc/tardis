@@ -17,11 +17,15 @@ home
 				{% endfor %}
 			</div>
 			{% if load_flag %}
-				<span id="post-load-button" class="btn btn-default pull-right" data-offset="0" onclick="load_posts({{ ajax_data }});">more</span>
+				<span id="post-load-button" class="btn btn-default pull-right" data-offset="0" onclick="load_posts({{ ajax_data }});">Show more</span>
 			{% endif %}
 
 		{% else %}
-			<div class="">No posts</div>
+			<div class="panel panel-default">
+				<div class="panel-body">
+					Nothing is found, try <a href="{% url 'index' %}">home page</a>
+				</div>
+			</div>
 		{% endif %}
 	</div>
 {% endblock content %}

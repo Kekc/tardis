@@ -5,9 +5,9 @@ Access Error
 {% endblock title %}
 
 {% block content %}
-<div class="">
-	<span>Access error</span>
-	<a href="{% url 'index' %}">home page</a>
-
-</div>
+	<div class="panel panel-default">
+		<div class="panel-body">
+			Access error, try <a href="{% url 'index' %}">home page</a>
+		</div>
+	</div>
 {% endblock content %}

@@ -5,9 +5,9 @@ Error 404
 {% endblock title %}
 
 {% block content %}
-<div class="">
-	<span>Page not found</span>
-	<a href="{% url 'index' %}">home page</a>
-
-</div>
+	<div class="panel panel-default">
+		<div class="panel-body">
+			Page is not found, try <a href="{% url 'index' %}">home page</a>
+		</div>
+	</div>
 {% endblock content %}

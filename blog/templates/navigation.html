@@ -1,7 +1,9 @@
 <div class="">
 	<nav class="navbar navbar-default">
+
 		<div class="collapse navbar-collapse">
 			<ul class="nav navbar-nav">
+				<li><img class="nav-logo" alt="Tardis" src="/static/img/the_tardis.png"></li>
 				{% for item in items %}
 					<li class="">
 						<a href="{{ item.link }}">{{ item.name }}</a>
@@ -10,13 +12,16 @@
 			</ul>
 			<form action="{% url 'search' %}" class="navbar-form navbar-left" role="search">
 				<div class="form-group">
-					<input type="text" class="form-control" placeholder="Search" name="query">
+					<input type="text" class="form-control"  name="query">
 				</div>
-				<button type="submit" class="btn btn-default">Submit</button>
+				<button type="submit" class="btn btn-default">
+					<span class="glyphicon glyphicon-search"></span>
+				</button>
 			</form>
 
 			{% if user %}
 			<ul class="nav navbar-nav navbar-right">
+
 				<li><a href="{% url 'author' user.id %}">{{ user.username }}</a></li>
 				<li><a href="{% url 'logout' %}">logout</a></li>
 			</ul>

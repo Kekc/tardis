@@ -3,3 +3,13 @@
     width: 970px;
   }
 }
+
+.container {
+  padding-bottom: 30px;
+}
+
+.nav-logo {
+  width: 50px;
+  height: 50px;
+}
+
