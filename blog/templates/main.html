@@ -9,10 +9,21 @@ home
 
 {% block content %}
 	{% if posts %}
-		{% for post in posts %}
-			{% post_template post.id %}
-		{% endfor %}
+		<div class="posts">
+			{% include "post_tpl.html" %}
+			{% for post in posts %}
+				{% post_template post.id %}
+			{% endfor %}
+		</div>
+		{% if load_flag %}
+			<span id="post-load-button" class="btn btn-primary" data-offset="0" onclick="load_posts({{ ajax_data }});">more</span>
+		{% endif %}
+
 	{% else %}
 		<div class="container">No posts</div>
 	{% endif %}
 {% endblock content %}
+
+{% block scripts %}
+
+{% endblock scripts %}

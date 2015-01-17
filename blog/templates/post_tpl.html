@@ -1,0 +1,24 @@
+{% verbatim %}
+	<script id="post_tpl" type="text/x-handlebars-template">
+		<div>
+			<div>
+				{{title}}
+			</div>
+			<div>
+				{{text}}
+			</div>
+			<div>
+				{{#each categories}}
+					<a href="{{this.url}}">{{this.name}}</a>
+				{{/each}}
+			</div>
+			<div>
+				<span><a href="{{author_url}}">{{author_name}}</a></span>
+				<span>{{created}}</span>
+				{{#if edit_flag}}
+					<span><a href="{{edit_url}}">edit</a></span>
+				{{/if}}
+			</div>
+		</div>
+	</script>
+{% endverbatim %}
