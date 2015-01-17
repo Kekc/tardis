@@ -210,7 +210,7 @@ class PostEditView(LoginRequiredMixin, UpdateView):
         return reverse('index')
 
     def render_to_response(self, context, **response_kwargs):
-        if context['post'].author == self.request.user:
+        if self.request.user.is_superuser or context['post'].author == self.request.user:
             return super(PostEditView, self).render_to_response(context, **response_kwargs)
         else:
             return render(self.request, 'access_error.html', {})
