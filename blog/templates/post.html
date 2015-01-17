@@ -3,7 +3,7 @@
 		<h3 class="panel-title">
 			{{ post.title }}
 			{% if edit_flag %}
-				<span class="pull-right"><a href="{% url 'edit_post' post.id %}">edit</a></span>
+				<span class="pull-right"><a class="white-link" href="{% url 'edit_post' post.id %}">edit</a></span>
 			{% endif %}
 		</h3>
 	</div>
