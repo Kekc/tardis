@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponse, HttpResponseRedirect, Http404
 from django.core.urlresolvers import reverse
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
@@ -12,10 +12,37 @@ from blog.forms import RegistrationForm, LoginForm
 
 
 class IndexView(ListView):
-    model = Post
     template_name = 'main.html'
     context_object_name = 'posts'
     queryset = Post.objects.all().order_by('-created')[:3]
+
+
+class CategoryView(ListView):
+    template_name = 'category.html'
+    context_object_name = 'posts'
+
+    def get_queryset(self):
+        self.category = get_object_or_404(Category, id=self.args[0])
+        return Post.objects.filter(categories=self.category.id).order_by('-created')[:3]
+
+    def get_context_data(self, **kwargs):
+        context = super(CategoryView, self).get_context_data(**kwargs)
+        context['category'] = self.category.name
+        return context
+
+
+class AuthorView(ListView):
+    template_name = 'author.html'
+    context_object_name = 'posts'
+
+    def get_queryset(self):
+        self.author = get_object_or_404(User, id=self.args[0])
+        return Post.objects.filter(author=self.author.id).order_by('-created')[:3]
+
+    def get_context_data(self, **kwargs):
+        context = super(AuthorView, self).get_context_data(**kwargs)
+        context['author'] = self.author.username
+        return context
 
 
 def registration(request):

@@ -7,11 +7,11 @@
 	</div>
 	<div>
 		{% for category in post.categories.all %}
-			<a href="#">{{ category.name }}</a>
+			<a href="{% url 'category' category.id %}">{{ category.name }}</a>
 		{% endfor %}
 	</div>
 	<div>
-		<span><a href="#">{{ post.author }}</a></span>
+		<span><a href="{% url 'author' post.author.id %}">{{ post.author }}</a></span>
 		<span>{{ post.created|date:"d-m-Y H:i:s" }}</span>
 	</div>
 </div>
