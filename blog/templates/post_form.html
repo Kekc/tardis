@@ -1,5 +1,5 @@
 {% extends "index.html" %}
-
+{% load crispy_forms_tags %}
 {% block title %}
 	new post
 {% endblock title %}
@@ -8,7 +8,7 @@
 	<div class="container">
 		<form method="post">
 			{% csrf_token %}
-			{{ form }}
+			{{ form|crispy }}
 			<input type="submit" value="Submit">
 		</form>
 	</div>
