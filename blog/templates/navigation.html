@@ -5,7 +5,7 @@
 	</span>
 {% endfor %}
 	<form action="{% url 'search' %}">
-		<input type="text" name="search">
+		<input type="text" name="query">
 		<input type="submit" value="search">
 	</form>
 	{% if user %}

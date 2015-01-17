@@ -1,7 +1,7 @@
 from django.conf.urls import patterns, include, url
 from django.contrib import admin
 from blog.views import IndexView, registration, login, logout, CategoryView, AuthorView, PostCreateView, PostEditView, \
-    SearchView, AjaxListView
+    SearchView
 
 urlpatterns = patterns('',
     (r'^admin/', include(admin.site.urls)),
@@ -13,8 +13,6 @@ urlpatterns = patterns('',
     url(r'^category/(\d+)/$', CategoryView.as_view(), name='category'),
     url(r'^author/(\d+)/$', AuthorView.as_view(), name='author'),
     url(r'^search/$', SearchView.as_view(), name='search'),
-
-    url(r'^ajax_load/$', AjaxListView.as_view(), name='ajax_load'),
 
     url(r'post/add/$', PostCreateView.as_view(), name='add_post'),
     url(r'post/edit/(?P<pk>\d+)/$', PostEditView.as_view(), name='edit_post'),

@@ -1,9 +1,6 @@
-
-
 var load_posts = function(data){
 	"use strict";
 
-	console.log(data);
 	var author = data['author'],
 		category = data['category'],
 		query = data['query'],
@@ -16,7 +13,7 @@ var load_posts = function(data){
 	$button.data('offset', new_offset);
 
 	$.ajax({
-			url: '/',
+			url: load_url,
 		data: {
 			offset: new_offset,
 			category: category,
@@ -26,7 +23,6 @@ var load_posts = function(data){
 
 		})
 		.done(function(data) {
-			console.log(data);
 			var load_flag = data['load_flag'],
 				posts = data['posts'],
 				$post_container = $('.posts'),
@@ -36,13 +32,11 @@ var load_posts = function(data){
 			}
 			if (posts) {
 				for (var i=0; i<posts.length; i++) {
-					console.log(posts[i]);
 					$post_container.append(template(posts[i]));
 				}
 			}
 		})
 		.fail(function(e) {
-			console.log('fail');
+			console.log('fail', e);
 		})
-
 };

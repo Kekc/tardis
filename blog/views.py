@@ -29,8 +29,6 @@ class JSONResponseMixin(object):
         """
         Returns an object that will be serialized as JSON by json.dumps().
         """
-
-        print 'context', context
         items = context['posts']
         posts = [{
             'id': item.id,
@@ -47,9 +45,8 @@ class JSONResponseMixin(object):
             'posts': posts,
             'load_flag': context['load_flag'],
         }
-        # result = [{'id': item.id} for item in objects]
-        # return list(objects.values('id', 'title', 'author', 'text', 'created', 'categories'))
         return data
+
 
 class IndexView(JSONResponseMixin, ListView):
     template_name = 'main.html'
@@ -57,115 +54,126 @@ class IndexView(JSONResponseMixin, ListView):
     queryset = Post.objects.all().order_by('-created')[:3]
 
     def get_queryset(self):
-        print 'queryset'
-        print self.request.GET
-        self.offset = int(self.request.GET.get('offset', 0))
-        print self.offset
+        offset = int(self.request.GET.get('offset', 0))
         qs = Post.objects.all().order_by('-created')
-        self.load_flag = True if qs[self.offset+3:self.offset+4] else False
-        return qs[self.offset:self.offset+3]
+        self.load_flag = True if qs[offset+3:offset+4] else False
+        return qs[offset:offset+3]
 
     def get_context_data(self, **kwargs):
-        print 'append'
         context = super(IndexView, self).get_context_data(**kwargs)
         context['load_flag'] = self.load_flag
         context['ajax_data'] = json.dumps({
-            # 'offset': self.offset,
             'category': None,
             'author': None,
             'query': None,
-            'load_url': reverse('ajax_load'),
+            'load_url': reverse('index'),
         })
-        # context['offset'] = self.offset
-        # context['category'] = None
-        # context['author'] = None
-        # context['query'] = None
-        # context['load_url'] = reverse('ajax_load')
-
         return context
 
     def render_to_response(self, context):
-        print 'response'
         if self.request.is_ajax():
             return self.render_to_json_response(context, self.request.user)
         else:
             return super(IndexView, self).render_to_response(context)
 
-    # def get(self, request, *args, **kwargs):
-    #     # view = super(IndexView, self).get(request, *args, **kwargs)
-    #     if request.is_ajax():
-    #         print self.request.GET
-    #         offset = int(request.GET.get('offset'))
-    #         category = request.GET.get('category')
-    #         author = request.GET.get('author')
-    #         query = request.GET.get('category')
-    #         return self.get_json_response(self.convert_context_to_json(context))
-    #     else:
-    #         return super(IndexView, self).get(request, *args, **kwargs)
 
-
-class CategoryView(ListView):
+class CategoryView(JSONResponseMixin, ListView):
     template_name = 'category.html'
     context_object_name = 'posts'
 
     def get_queryset(self):
+        offset = int(self.request.GET.get('offset', 0))
         self.category = get_object_or_404(Category, id=self.args[0])
-        return Post.objects.filter(categories=self.category.id).order_by('-created')[:3]
+        qs = Post.objects.filter(categories=self.category.id).order_by('-created')
+        self.load_flag = True if qs[offset+3:offset+4] else False
+        return qs[offset:offset+3]
 
     def get_context_data(self, **kwargs):
         context = super(CategoryView, self).get_context_data(**kwargs)
         context['category'] = self.category.name
+        context['load_flag'] = self.load_flag
+        context['ajax_data'] = json.dumps({
+            'category': self.category.id,
+            'author': None,
+            'query': None,
+            'load_url': reverse('category', args=(self.category.id,)),
+        })
         return context
 
+    def render_to_response(self, context):
+        if self.request.is_ajax():
+            return self.render_to_json_response(context, self.request.user)
+        else:
+            return super(CategoryView, self).render_to_response(context)
 
-class AuthorView(ListView):
+
+class AuthorView(JSONResponseMixin, ListView):
     template_name = 'author.html'
     context_object_name = 'posts'
 
     def get_queryset(self):
+        offset = int(self.request.GET.get('offset', 0))
         self.author = get_object_or_404(User, id=self.args[0])
-        return Post.objects.filter(author=self.author.id).order_by('-created')[:3]
+        qs = Post.objects.filter(author=self.author.id).order_by('-created')
+        self.load_flag = True if qs[offset+3:offset+4] else False
+        return qs[offset:offset+3]
 
     def get_context_data(self, **kwargs):
         context = super(AuthorView, self).get_context_data(**kwargs)
         context['author'] = self.author.username
+        context['load_flag'] = self.load_flag
+        context['ajax_data'] = json.dumps({
+            'category': None,
+            'author': self.author.id,
+            'query': None,
+            'load_url': reverse('author', args=(self.author.id,)),
+        })
         return context
 
+    def render_to_response(self, context):
+        if self.request.is_ajax():
+            return self.render_to_json_response(context, self.request.user)
+        else:
+            return super(AuthorView, self).render_to_response(context)
 
-class SearchView(ListView):
+
+class SearchView(JSONResponseMixin, ListView):
     template_name = 'search.html'
     context_object_name = 'posts'
 
     def get_queryset(self):
-        self.query = self.request.GET.get('search')
+        offset = int(self.request.GET.get('offset', 0))
+        self.query = self.request.GET.get('query')
+
         query = self.query.strip().split(' ')
         if query:
             query_list = [(Q(text__contains=word) | Q(title__contains=word) |
                 Q(categories__name__contains=word)) for word in query]
             query = reduce(lambda a, b: a & b, query_list)
-            qs = Post.objects.filter(query).distinct()
+            qs = Post.objects.filter(query).distinct().order_by('-created')
         else:
-            qs = Post.objects.all()
-        return qs.order_by('-created')[:3]
+            qs = []
+
+        self.load_flag = True if qs[offset+3:offset+4] else False
+        return qs[offset:offset+3]
 
     def get_context_data(self, **kwargs):
         context = super(SearchView, self).get_context_data(**kwargs)
         context['query'] = self.query
+        context['load_flag'] = self.load_flag
+        context['ajax_data'] = json.dumps({
+            'category': None,
+            'author': None,
+            'query': self.query,
+            'load_url': reverse('search')+'?%s' % self.query,
+        })
         return context
 
-
-
-
-
-class AjaxListView(JSONResponseMixin, ListView):
-
-    def get(self, request):
-        if request.is_ajax():
-            offset = int(request.GET.get('offset'))
-            category = request.GET.get('category')
-            author = request.GET.get('author')
-            query = request.GET.get('category')
-            return self.render_to_response({'data': 1})
+    def render_to_response(self, context):
+        if self.request.is_ajax():
+            return self.render_to_json_response(context, self.request.user)
+        else:
+            return super(SearchView, self).render_to_response(context)
 
 
 class PostCreateView(CreateView):
