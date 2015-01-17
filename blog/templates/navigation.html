@@ -4,7 +4,10 @@
 		<a href="{{ item.link }}">{{ item.name }}</a>
 	</span>
 {% endfor %}
-	<input type="text" name="search">
+	<form action="{% url 'search' %}">
+		<input type="text" name="search">
+		<input type="submit" value="search">
+	</form>
 	{% if user %}
 		<span>{{ user }}</span>
 		<a href="{% url 'logout' %}">logout</a>

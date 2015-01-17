@@ -8,8 +8,11 @@ home
 {% endblock current_page %}
 
 {% block content %}
-	{% for post in posts %}
-		{% post_template post.id %}
-	{% endfor %}
-
+	{% if posts %}
+		{% for post in posts %}
+			{% post_template post.id %}
+		{% endfor %}
+	{% else %}
+		<div class="container">No posts</div>
+	{% endif %}
 {% endblock content %}

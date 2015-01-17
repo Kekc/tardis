@@ -6,6 +6,7 @@ from django.core.urlresolvers import reverse
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.views.generic import ListView
 from django.contrib import auth
+from django.db.models import Q
 
 from blog.models import Category, Post, User
 from blog.forms import RegistrationForm, LoginForm
@@ -42,6 +43,30 @@ class AuthorView(ListView):
     def get_context_data(self, **kwargs):
         context = super(AuthorView, self).get_context_data(**kwargs)
         context['author'] = self.author.username
+        return context
+
+
+class SearchView(ListView):
+    template_name = 'search.html'
+    context_object_name = 'posts'
+
+    def get_queryset(self):
+        self.query = self.request.GET.get('search')
+        query = self.query.strip().split(' ')
+        print query
+        if query:
+            query_list = [(Q(text__contains=word) | Q(title__contains=word) |
+                Q(categories__name__contains=word)) for word in query]
+            query = reduce(lambda a, b: a & b, query_list)
+            qs = Post.objects.filter(query).distinct()
+            print query
+        else:
+            qs = Post.objects.all()
+        return qs.order_by('-created')[:3]
+
+    def get_context_data(self, **kwargs):
+        context = super(SearchView, self).get_context_data(**kwargs)
+        context['query'] = self.query
         return context
 
 
