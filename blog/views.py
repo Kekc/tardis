@@ -166,7 +166,7 @@ class SearchView(AJAXLoadListView):
 
     def get_context_data(self, **kwargs):
         data = {
-            'load_url': reverse('basic_search')+'?%s' % self.query,
+            'load_url': reverse('basic_search')+'?q=%s' % self.query,
             'query': self.query,
         }
         context = super(SearchView, self).get_context_data(**data)
