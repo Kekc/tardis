@@ -63,9 +63,16 @@ class JSONResponseMixin(object):
 
 class AJAXLoadListView(JSONResponseMixin, ListView):
 
+    def dispatch(self, *args, **kwargs):
+        self.offset = int(self.request.GET.get('offset', 0))
+        return super(AJAXLoadListView, self).dispatch(*args, **kwargs)
+
     def get_context_data(self, **kwargs):
+        qs = self.object_list
+        load_flag = True if (qs and qs.count() > (self.offset + settings.POSTS_ON_PAGE)) else False
+        self.object_list = qs[self.offset:self.offset+settings.POSTS_ON_PAGE]
         context = super(AJAXLoadListView, self).get_context_data(**kwargs)
-        context['load_flag'] = self.load_flag
+        context['load_flag'] = load_flag
         context['index_flag'] = kwargs.get('index_flag')
         context['ajax_data'] = json.dumps({
             'category': kwargs.get('category'),
@@ -85,12 +92,7 @@ class AJAXLoadListView(JSONResponseMixin, ListView):
 class IndexView(AJAXLoadListView):
     template_name = 'main.html'
     context_object_name = 'posts'
-
-    def get_queryset(self):
-        offset = int(self.request.GET.get('offset', 0))
-        qs = Post.objects.all().order_by('-created')
-        self.load_flag = True if qs.count() > (offset + settings.POSTS_ON_PAGE) else False
-        return qs[offset:offset+settings.POSTS_ON_PAGE]
+    model = Post
 
     def get_context_data(self, **kwargs):
         data = {
@@ -105,11 +107,9 @@ class CategoryView(AJAXLoadListView):
     context_object_name = 'posts'
 
     def get_queryset(self):
-        offset = int(self.request.GET.get('offset', 0))
         self.category = get_object_or_404(Category, id=self.kwargs.get('pk'))
-        qs = Post.objects.filter(categories=self.category.id).order_by('-created')
-        self.load_flag = True if qs.count() > (offset + settings.POSTS_ON_PAGE) else False
-        return qs[offset:offset+settings.POSTS_ON_PAGE]
+        qs = Post.objects.filter(categories=self.category.id)
+        return qs
 
     def get_context_data(self, **kwargs):
         data = {
@@ -126,11 +126,9 @@ class AuthorView(AJAXLoadListView):
     context_object_name = 'posts'
 
     def get_queryset(self):
-        offset = int(self.request.GET.get('offset', 0))
         self.author = get_object_or_404(User, id=self.kwargs.get('pk'))
-        qs = Post.objects.filter(author=self.author.id).order_by('-created')
-        self.load_flag = True if qs.count() > (offset + settings.POSTS_ON_PAGE) else False
-        return qs[offset:offset+settings.POSTS_ON_PAGE]
+        qs = Post.objects.filter(author=self.author.id)
+        return qs
 
     def get_context_data(self, **kwargs):
         data = {
@@ -147,7 +145,6 @@ class SearchView(AJAXLoadListView):
     context_object_name = 'posts'
 
     def get_queryset(self):
-        offset = int(self.request.GET.get('offset', 0))
         self.query = self.request.GET.get('q')
         qs = []
         if self.query:
@@ -156,12 +153,10 @@ class SearchView(AJAXLoadListView):
                 query_list = [(Q(text__contains=word) | Q(title__contains=word) |
                     Q(categories__name__contains=word)) for word in query]
                 query = reduce(lambda a, b: a & b, query_list)
-                qs = Post.objects.filter(query).distinct().order_by('-created')
+                qs = Post.objects.filter(query).distinct()
         else:
             self.query = ''
-
-        self.load_flag = True if (qs and qs.count()) > (offset + settings.POSTS_ON_PAGE) else False
-        return qs[offset:offset+settings.POSTS_ON_PAGE]
+        return qs
 
     def get_context_data(self, **kwargs):
         data = {

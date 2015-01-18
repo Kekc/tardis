@@ -20,5 +20,8 @@ class Post(models.Model):
     created = models.DateTimeField('Created at', auto_now_add=True)
     edited = models.DateTimeField('Edited at', auto_now=True)
 
+    class Meta:
+        ordering = ('-created', )
+
     def __unicode__(self):
         return '{0}, {1}'.format(self.author.username, self.title)
