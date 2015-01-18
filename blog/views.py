@@ -3,7 +3,7 @@ import json
 from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponseRedirect, JsonResponse
 from django.core.urlresolvers import reverse
-from django.views.generic.edit import CreateView, UpdateView
+from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.views.generic import ListView
 from django.contrib import auth
 from django.db.models import Q
@@ -47,11 +47,11 @@ class JSONResponseMixin(object):
             'author_name': item.author.username,
             'author_url': reverse('author', args=(item.author.id,)),
             'edit_url': reverse('edit_post', args=(item.id,)),
+            'delete_url': reverse('delete_post', args=(item.id,)),
             'edit_flag': user == item.author or user.is_superuser,
             'categories': [{'url': reverse('category', args=(category.id,)), 'name': category.name}
                            for category in item.categories.all()],
             'created': naturaltime(item.created),
-            # 'created': item.created.strftime('%Y-%m-%d %H:%M:%S'),
 
         } for item in items]
         data = {
@@ -175,7 +175,7 @@ class SearchView(AJAXLoadListView):
 
 class PostCreateView(LoginRequiredMixin, CreateView):
     model = Post
-    fields = ['title', 'text', 'categories']
+    fields = ('title', 'text', 'categories', )
     template_name = 'post_form.html'
 
     def get_success_url(self):
@@ -188,7 +188,7 @@ class PostCreateView(LoginRequiredMixin, CreateView):
 
 class PostEditView(LoginRequiredMixin, UpdateView):
     model = Post
-    fields = ['title', 'text', 'categories']
+    fields = ('title', 'text', 'categories', )
     template_name = 'post_form.html'
 
     def get_success_url(self):
@@ -197,6 +197,20 @@ class PostEditView(LoginRequiredMixin, UpdateView):
     def render_to_response(self, context, **response_kwargs):
         if self.request.user.is_superuser or context['post'].author == self.request.user:
             return super(PostEditView, self).render_to_response(context, **response_kwargs)
+        else:
+            return render(self.request, 'access_error.html', {})
+
+
+class PostDeleteView(LoginRequiredMixin, DeleteView):
+    model = Post
+    template_name = 'post_delete.html'
+
+    def get_success_url(self):
+        return reverse('index')
+
+    def render_to_response(self, context, **response_kwargs):
+        if self.request.user.is_superuser or context['post'].author == self.request.user:
+            return super(PostDeleteView, self).render_to_response(context, **response_kwargs)
         else:
             return render(self.request, 'access_error.html', {})
 
