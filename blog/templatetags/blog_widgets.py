@@ -1,10 +1,9 @@
-# -*- coding: utf-8 -*-
-
 from django.core.urlresolvers import reverse
-from django import template
 from django.conf import settings
+from django import template
 
 from blog.models import Post
+
 
 register = template.Library()
 
@@ -37,6 +36,7 @@ def navigation(context):
         items.extend([signup_item, signin_item])
     data['items'] = items
     data['search_url'] = reverse(settings.SEARCH_ENGINE)
+    data['query'] = context.get('query', '')
     return data
 
 @register.inclusion_tag('post.html', takes_context=True)

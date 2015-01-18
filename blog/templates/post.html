@@ -1,4 +1,5 @@
 {% if post %}
+{% load humanize %}
 <div class="panel panel-primary">
 	<div class="panel-heading">
 		<h3 class="panel-title">
@@ -25,7 +26,7 @@
 						{% endfor %}
 				</div>
 			{% endif %}
-			<div class="col-md-3 pull-right">posted at: {{ post.created|date:"d-m-Y H:i:s" }}</div>
+			<div class="col-md-3 pull-right">posted {{ post.created|naturaltime }}</div>
 
 		</div>
 	</div>

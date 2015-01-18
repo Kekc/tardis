@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 import json
 
 from django.shortcuts import render, get_object_or_404
@@ -12,13 +10,14 @@ from django.db.models import Q
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 from django.conf import settings
+from django.contrib.humanize.templatetags.humanize import naturaltime
 
 from blog.models import Category, Post, User
 from blog.forms import RegistrationForm, LoginForm
 
 
 class LoginRequiredMixin(object):
-    u"""Ensures that user must be authenticated in order to access view."""
+    """Ensures that user must be authenticated in order to access view."""
 
     @method_decorator(login_required)
     def dispatch(self, *args, **kwargs):
@@ -51,7 +50,8 @@ class JSONResponseMixin(object):
             'edit_flag': user == item.author or user.is_superuser,
             'categories': [{'url': reverse('category', args=(category.id,)), 'name': category.name}
                            for category in item.categories.all()],
-            'created': item.created.strftime('%Y-%m-%d %H:%M:%S'),
+            'created': naturaltime(item.created),
+            # 'created': item.created.strftime('%Y-%m-%d %H:%M:%S'),
 
         } for item in items]
         data = {
@@ -85,7 +85,6 @@ class AJAXLoadListView(JSONResponseMixin, ListView):
 class IndexView(AJAXLoadListView):
     template_name = 'main.html'
     context_object_name = 'posts'
-    queryset = Post.objects.all().order_by('-created')[:3]
 
     def get_queryset(self):
         offset = int(self.request.GET.get('offset', 0))
@@ -166,7 +165,7 @@ class SearchView(AJAXLoadListView):
 
     def get_context_data(self, **kwargs):
         data = {
-            'load_url': reverse('basic_search')+'?q=%s' % self.query,
+            'load_url': '{0}?q={1}'.format(reverse('basic_search'), self.query),
             'query': self.query,
         }
         context = super(SearchView, self).get_context_data(**data)
