@@ -1,0 +1,13 @@
+{% extends "main.html" %}
+
+{% block title %}
+Error 500
+{% endblock title %}
+
+{% block content %}
+	<div class="panel panel-default">
+		<div class="panel-body">
+			An error occured, try <a href="{% url 'index' %}">home page</a>
+		</div>
+	</div>
+{% endblock content %}

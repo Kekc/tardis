@@ -23,7 +23,11 @@ home
 		{% else %}
 			<div class="panel panel-default">
 				<div class="panel-body">
-					Nothing is found, try <a href="{% url 'index' %}">home page</a>
+					{% if index_flag %}
+						No posts yet
+					{% else %}
+						Nothing is found, try <a href="{% url 'index' %}">home page</a>
+					{% endif %}
 				</div>
 			</div>
 		{% endif %}

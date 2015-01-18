@@ -3,7 +3,7 @@
 import json
 
 from django.shortcuts import render, get_object_or_404
-from django.http import HttpResponseRedirect, Http404, JsonResponse
+from django.http import HttpResponseRedirect, JsonResponse
 from django.core.urlresolvers import reverse
 from django.views.generic.edit import CreateView, UpdateView
 from django.views.generic import ListView
@@ -48,7 +48,8 @@ class JSONResponseMixin(object):
             'author_url': reverse('author', args=(item.author.id,)),
             'edit_url': reverse('edit_post', args=(item.id,)),
             'edit_flag': user == item.author or user.is_superuser,
-            'categories': [{'url': reverse('category', args=(category.id,)), 'name': category.name} for category in item.categories.all()],
+            'categories': [{'url': reverse('category', args=(category.id,)), 'name': category.name}
+                           for category in item.categories.all()],
             'created': item.created.strftime('%Y-%m-%d %H:%M:%S'),
 
         } for item in items]
@@ -67,12 +68,13 @@ class IndexView(JSONResponseMixin, ListView):
     def get_queryset(self):
         offset = int(self.request.GET.get('offset', 0))
         qs = Post.objects.all().order_by('-created')
-        self.load_flag = True if qs[offset+3:offset+4] else False
+        self.load_flag = True if qs.count() > (offset + 3) else False
         return qs[offset:offset+3]
 
     def get_context_data(self, **kwargs):
         context = super(IndexView, self).get_context_data(**kwargs)
         context['load_flag'] = self.load_flag
+        context['index_flag'] = True
         context['ajax_data'] = json.dumps({
             'category': None,
             'author': None,
@@ -245,10 +247,6 @@ def login(request):
             user = form.login(request)
             if user:
                 auth.login(request, user)
-            # data = form.cleaned_data
-            # user = auth.authenticate(username=data['username'], password=data['password'])
-            # if user:
-            #     auth.login(request, user)
                 return HttpResponseRedirect(reverse('index'))
 
     else:

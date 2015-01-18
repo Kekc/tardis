@@ -40,10 +40,12 @@ def navigation(context):
 @register.inclusion_tag('post.html', takes_context=True)
 def post_template(context, post_id):
     request = context['request']
-    data = {}
     try:
         post = Post.objects.get(pk=post_id)
     except Post.DoesNotExist:
         post = None
-    edit_flag = request.user == post.author or request.user.is_superuser
-    return {'post': post, 'edit_flag': edit_flag}
+    if post:
+        edit_flag = request.user == post.author or request.user.is_superuser
+        return {'post': post, 'edit_flag': edit_flag}
+    else:
+        return {}
