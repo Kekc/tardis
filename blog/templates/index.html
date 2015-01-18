@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
+<head>
     {% load blog_widgets %}
     {% load staticfiles %}
 
@@ -15,15 +15,11 @@
   </head>
   <body>
   <div class="container">
-    {% block navigation_menu %}
-      {% navigation %}
-    {% endblock navigation_menu %}
+    {% block navigation_menu %}{% navigation %}{% endblock navigation_menu %}
 
-    {% block current_page %}
-    {% endblock current_page %}
+    {% block current_page %}{% endblock current_page %}
 
-    {% block content %}
-    {% endblock content %}
+    {% block content %}{% endblock content %}
 
   </div>
   </body>
@@ -34,8 +30,4 @@
     <script src="{% static 'js/bootstrap.min.js' %}"></script>
     <script src="{% static 'js/handlebars-v2.0.0.js' %}"></script>
     <script src="{% static 'js/blog.js' %}"></script>
-  <script>
-    {% block scripts %}
-    {% endblock scripts %}
-  </script>
 </html>

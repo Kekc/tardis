@@ -1,5 +1,6 @@
 {% extends "index.html" %}
 {% load crispy_forms_tags %}
+
 {% block title %}
 {% if object %}edit post{% else %}new post{% endif %}
 {% endblock title %}
@@ -11,6 +12,5 @@
 			{{ form|crispy }}
 			<input class="btn btn-default" type="submit" value="Submit">
 		</form>
-		{{ object }}
 	</div>
 {% endblock %}
