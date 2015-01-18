@@ -3,8 +3,8 @@ import json
 from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponseRedirect, JsonResponse
 from django.core.urlresolvers import reverse
-from django.views.generic.edit import CreateView, UpdateView, DeleteView
-from django.views.generic import ListView
+from django.views.generic import ListView, RedirectView
+from django.views.generic.edit import FormView, CreateView, UpdateView, DeleteView
 from django.contrib import auth
 from django.db.models import Q
 from django.contrib.auth.decorators import login_required
@@ -215,43 +215,53 @@ class PostDeleteView(LoginRequiredMixin, DeleteView):
             return render(self.request, 'access_error.html', {})
 
 
-def registration(request):
-    if request.user.is_authenticated():
-        return HttpResponseRedirect(reverse('index'))
-    if request.method == 'POST':
-        form = RegistrationForm(request.POST)
-        if form.is_valid():
-            data = form.cleaned_data
-            user = User.objects.create_user(username=data['username'], password=data['password1'])
-            user.save()
-            user_to_auth = auth.authenticate(username=data['username'], password=data['password1'])
-            auth.login(request, user_to_auth)
+class RegistrationView(FormView):
+    template_name = 'registration.html'
+    form_class = RegistrationForm
 
+    def get_success_url(self):
+        return reverse('index')
+
+    def get(self, request, *args, **kwargs):
+        if request.user.is_authenticated():
             return HttpResponseRedirect(reverse('index'))
+        return super(RegistrationView, self).get(request, *args, **kwargs)
 
-    else:
-        form = RegistrationForm()
+    def form_valid(self, form):
+        data = form.cleaned_data
+        user = User.objects.create_user(username=data['username'], password=data['password1'])
+        user.save()
+        user_to_auth = auth.authenticate(username=data['username'], password=data['password1'])
+        auth.login(self.request, user_to_auth)
 
-    return render(request, 'registration.html', {'form': form})
-
-
-def login(request):
-    if request.user.is_authenticated():
-        return HttpResponseRedirect(reverse('index'))
-    if request.method == 'POST':
-        form = LoginForm(request.POST)
-        if form.is_valid():
-            user = form.login(request)
-            if user:
-                auth.login(request, user)
-                return HttpResponseRedirect(reverse('index'))
-
-    else:
-        form = LoginForm()
-
-    return render(request, 'login.html', {'form': form})
+        return super(RegistrationView, self).form_valid(form)
 
 
-def logout(request):
-    auth.logout(request)
-    return HttpResponseRedirect(reverse('index'))
+class LoginView(FormView):
+    template_name = 'login.html'
+    form_class = LoginForm
+
+    def get_success_url(self):
+        return reverse('index')
+
+    def get(self, request, *args, **kwargs):
+        if request.user.is_authenticated():
+            return HttpResponseRedirect(reverse('index'))
+        return super(LoginView, self).get(request, *args, **kwargs)
+
+    def form_valid(self, form):
+        user = form.login(self.request)
+        if user:
+            auth.login(self.request, user)
+        return super(LoginView, self).form_valid(form)
+
+
+class LogoutView(RedirectView):
+
+    def get_redirect_url(self, *args, **kwargs):
+        return reverse('index')
+
+    def get(self, request, *args, **kwargs):
+        if request.user.is_authenticated():
+            auth.logout(request)
+        return super(LogoutView, self).get(request, *args, **kwargs)

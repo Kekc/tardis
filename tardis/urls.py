@@ -1,6 +1,6 @@
 from django.conf.urls import patterns, include, url
 from django.contrib import admin
-from blog.views import IndexView, registration, login, logout, CategoryView, AuthorView, PostCreateView, PostEditView, \
+from blog.views import IndexView, RegistrationView, LoginView, LogoutView, CategoryView, AuthorView, PostCreateView, PostEditView, \
     PostDeleteView, SearchView
 
 urlpatterns = patterns('',
@@ -8,9 +8,9 @@ urlpatterns = patterns('',
     (r'^search/', include('haystack.urls')),
 
     url(r'^$', IndexView.as_view(), name='index'),
-    url(r'^registration/$', registration, name='registration'),
-    url(r'^login/$', login, name='login'),
-    url(r'^logout/$', logout, name='logout'),
+    url(r'^registration/$', RegistrationView.as_view(), name='registration'),
+    url(r'^login/$', LoginView.as_view(), name='login'),
+    url(r'^logout/$', LogoutView.as_view(), name='logout'),
 
     url(r'^category/(?P<pk>\d+)/$', CategoryView.as_view(), name='category'),
     url(r'^author/(?P<pk>\d+)/$', AuthorView.as_view(), name='author'),
