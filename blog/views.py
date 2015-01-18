@@ -12,7 +12,6 @@ from django.db.models import Q
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 
-
 from blog.models import Category, Post, User
 from blog.forms import RegistrationForm, LoginForm
 
@@ -156,15 +155,16 @@ class SearchView(JSONResponseMixin, ListView):
     def get_queryset(self):
         offset = int(self.request.GET.get('offset', 0))
         self.query = self.request.GET.get('query')
-
-        query = self.query.strip().split(' ')
-        if query:
-            query_list = [(Q(text__contains=word) | Q(title__contains=word) |
-                Q(categories__name__contains=word)) for word in query]
-            query = reduce(lambda a, b: a & b, query_list)
-            qs = Post.objects.filter(query).distinct().order_by('-created')
+        qs = []
+        if self.query:
+            query = self.query.strip().split(' ')
+            if query:
+                query_list = [(Q(text__contains=word) | Q(title__contains=word) |
+                    Q(categories__name__contains=word)) for word in query]
+                query = reduce(lambda a, b: a & b, query_list)
+                qs = Post.objects.filter(query).distinct().order_by('-created')
         else:
-            qs = []
+            self.query = ''
 
         self.load_flag = True if qs[offset+3:offset+4] else False
         return qs[offset:offset+3]
@@ -242,11 +242,14 @@ def login(request):
     if request.method == 'POST':
         form = LoginForm(request.POST)
         if form.is_valid():
-            data = form.cleaned_data
-            user = auth.authenticate(username=data['username'], password=data['password'])
-            auth.login(request, user)
-
-            return HttpResponseRedirect(reverse('index'))
+            user = form.login(request)
+            if user:
+                auth.login(request, user)
+            # data = form.cleaned_data
+            # user = auth.authenticate(username=data['username'], password=data['password'])
+            # if user:
+            #     auth.login(request, user)
+                return HttpResponseRedirect(reverse('index'))
 
     else:
         form = LoginForm()

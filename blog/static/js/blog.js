@@ -38,5 +38,14 @@ var load_posts = function(data){
 		})
 		.fail(function(e) {
 			console.log('fail', e);
-		})
+		});
 };
+
+$('#form-search-submit').on('click', function(e){
+	if ($('#form-search-input').val()) {
+		$('#form-search').submit();
+	}
+	else {
+		e.preventDefault();
+	}
+});

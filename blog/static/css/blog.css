@@ -20,3 +20,12 @@
  .white-link {
    color: #fff;
  }
+
+ .panel-word-wrap {
+   word-wrap: break-word;
+ }
+
+ .post-category {
+   display: inline-block;
+   padding: 0 5px;
+ }
