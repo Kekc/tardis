@@ -11,6 +11,7 @@ from django.contrib import auth
 from django.db.models import Q
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
+from django.conf import settings
 
 from blog.models import Category, Post, User
 from blog.forms import RegistrationForm, LoginForm
@@ -60,7 +61,28 @@ class JSONResponseMixin(object):
         return data
 
 
-class IndexView(JSONResponseMixin, ListView):
+class AJAXLoadListView(JSONResponseMixin, ListView):
+
+    def get_context_data(self, **kwargs):
+        context = super(AJAXLoadListView, self).get_context_data(**kwargs)
+        context['load_flag'] = self.load_flag
+        context['index_flag'] = kwargs.get('index_flag')
+        context['ajax_data'] = json.dumps({
+            'category': kwargs.get('category'),
+            'author': kwargs.get('author'),
+            'query': kwargs.get('query'),
+            'load_url': kwargs.get('load_url'),
+        })
+        return context
+
+    def render_to_response(self, context, **response_kwargs):
+        if self.request.is_ajax():
+            return self.render_to_json_response(context, self.request.user)
+        else:
+            return super(AJAXLoadListView, self).render_to_response(context, **response_kwargs)
+
+
+class IndexView(AJAXLoadListView):
     template_name = 'main.html'
     context_object_name = 'posts'
     queryset = Post.objects.all().order_by('-created')[:3]
@@ -68,29 +90,18 @@ class IndexView(JSONResponseMixin, ListView):
     def get_queryset(self):
         offset = int(self.request.GET.get('offset', 0))
         qs = Post.objects.all().order_by('-created')
-        self.load_flag = True if qs.count() > (offset + 3) else False
-        return qs[offset:offset+3]
+        self.load_flag = True if qs.count() > (offset + settings.POSTS_ON_PAGE) else False
+        return qs[offset:offset+settings.POSTS_ON_PAGE]
 
     def get_context_data(self, **kwargs):
-        context = super(IndexView, self).get_context_data(**kwargs)
-        context['load_flag'] = self.load_flag
-        context['index_flag'] = True
-        context['ajax_data'] = json.dumps({
-            'category': None,
-            'author': None,
-            'query': None,
+        data = {
+            'index_flag': True,
             'load_url': reverse('index'),
-        })
-        return context
-
-    def render_to_response(self, context, **response_kwargs):
-        if self.request.is_ajax():
-            return self.render_to_json_response(context, self.request.user)
-        else:
-            return super(IndexView, self).render_to_response(context, **response_kwargs)
+        }
+        return super(IndexView, self).get_context_data(**data)
 
 
-class CategoryView(JSONResponseMixin, ListView):
+class CategoryView(AJAXLoadListView):
     template_name = 'category.html'
     context_object_name = 'posts'
 
@@ -98,29 +109,21 @@ class CategoryView(JSONResponseMixin, ListView):
         offset = int(self.request.GET.get('offset', 0))
         self.category = get_object_or_404(Category, id=self.args[0])
         qs = Post.objects.filter(categories=self.category.id).order_by('-created')
-        self.load_flag = True if qs[offset+3:offset+4] else False
-        return qs[offset:offset+3]
+        self.load_flag = True if qs.count() > (offset + settings.POSTS_ON_PAGE) else False
+        return qs[offset:offset+settings.POSTS_ON_PAGE]
 
     def get_context_data(self, **kwargs):
-        context = super(CategoryView, self).get_context_data(**kwargs)
-        context['category'] = self.category.name
-        context['load_flag'] = self.load_flag
-        context['ajax_data'] = json.dumps({
-            'category': self.category.id,
-            'author': None,
-            'query': None,
+        data = {
+            'index_flag': False,
             'load_url': reverse('category', args=(self.category.id,)),
-        })
+            'category': self.category.id,
+        }
+        context = super(CategoryView, self).get_context_data(**data)
+        context['category'] = self.category.name
         return context
 
-    def render_to_response(self, context, **response_kwargs):
-        if self.request.is_ajax():
-            return self.render_to_json_response(context, self.request.user)
-        else:
-            return super(CategoryView, self).render_to_response(context, **response_kwargs)
 
-
-class AuthorView(JSONResponseMixin, ListView):
+class AuthorView(AJAXLoadListView):
     template_name = 'author.html'
     context_object_name = 'posts'
 
@@ -128,29 +131,21 @@ class AuthorView(JSONResponseMixin, ListView):
         offset = int(self.request.GET.get('offset', 0))
         self.author = get_object_or_404(User, id=self.args[0])
         qs = Post.objects.filter(author=self.author.id).order_by('-created')
-        self.load_flag = True if qs[offset+3:offset+4] else False
-        return qs[offset:offset+3]
+        self.load_flag = True if qs.count() > (offset + settings.POSTS_ON_PAGE) else False
+        return qs[offset:offset+settings.POSTS_ON_PAGE]
 
     def get_context_data(self, **kwargs):
-        context = super(AuthorView, self).get_context_data(**kwargs)
-        context['author'] = self.author.username
-        context['load_flag'] = self.load_flag
-        context['ajax_data'] = json.dumps({
-            'category': None,
-            'author': self.author.id,
-            'query': None,
+        data = {
+            'index_flag': False,
             'load_url': reverse('author', args=(self.author.id,)),
-        })
+            'author': self.author.id,
+        }
+        context = super(AuthorView, self).get_context_data(**data)
+        context['author'] = self.author.username
         return context
 
-    def render_to_response(self, context, **response_kwargs):
-        if self.request.is_ajax():
-            return self.render_to_json_response(context, self.request.user)
-        else:
-            return super(AuthorView, self).render_to_response(context, **response_kwargs)
 
-
-class SearchView(JSONResponseMixin, ListView):
+class SearchView(AJAXLoadListView):
     template_name = 'search.html'
     context_object_name = 'posts'
 
@@ -168,26 +163,18 @@ class SearchView(JSONResponseMixin, ListView):
         else:
             self.query = ''
 
-        self.load_flag = True if qs[offset+3:offset+4] else False
-        return qs[offset:offset+3]
+        self.load_flag = True if qs.count() > (offset + settings.POSTS_ON_PAGE) else False
+        return qs[offset:offset+settings.POSTS_ON_PAGE]
 
     def get_context_data(self, **kwargs):
-        context = super(SearchView, self).get_context_data(**kwargs)
-        context['query'] = self.query
-        context['load_flag'] = self.load_flag
-        context['ajax_data'] = json.dumps({
-            'category': None,
-            'author': None,
-            'query': self.query,
+        data = {
+            'index_flag': False,
             'load_url': reverse('search')+'?%s' % self.query,
-        })
+            'query': self.query,
+        }
+        context = super(SearchView, self).get_context_data(**data)
+        context['query'] = self.query
         return context
-
-    def render_to_response(self, context, **response_kwargs):
-        if self.request.is_ajax():
-            return self.render_to_json_response(context, self.request.user)
-        else:
-            return super(SearchView, self).render_to_response(context, **response_kwargs)
 
 
 class PostCreateView(LoginRequiredMixin, CreateView):
