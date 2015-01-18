@@ -17,6 +17,7 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.humanize',
     'crispy_forms',
     'haystack',
     'blog',
@@ -80,5 +81,5 @@ HAYSTACK_CONNECTIONS = {
     },
 }
 
-# SEARCH_ENGINE = 'basic_search'
-SEARCH_ENGINE = 'haystack_search'
+SEARCH_ENGINE = 'basic_search'
+# SEARCH_ENGINE = 'haystack_search'
