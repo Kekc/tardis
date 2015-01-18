@@ -12,8 +12,8 @@ urlpatterns = patterns('',
     url(r'^login/$', login, name='login'),
     url(r'^logout/$', logout, name='logout'),
 
-    url(r'^category/(?P<category_id>\d+)/$', CategoryView.as_view(), name='category'),
-    url(r'^author/(?P<author_id>\d+)/$', AuthorView.as_view(), name='author'),
+    url(r'^category/(?P<pk>\d+)/$', CategoryView.as_view(), name='category'),
+    url(r'^author/(?P<pk>\d+)/$', AuthorView.as_view(), name='author'),
     url(r'^basic_search/$', SearchView.as_view(), name='basic_search'),
 
     url(r'post/add/$', PostCreateView.as_view(), name='add_post'),

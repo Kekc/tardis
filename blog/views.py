@@ -106,7 +106,7 @@ class CategoryView(AJAXLoadListView):
 
     def get_queryset(self):
         offset = int(self.request.GET.get('offset', 0))
-        self.category = get_object_or_404(Category, id=self.args[0])
+        self.category = get_object_or_404(Category, id=self.kwargs.get('pk'))
         qs = Post.objects.filter(categories=self.category.id).order_by('-created')
         self.load_flag = True if qs.count() > (offset + settings.POSTS_ON_PAGE) else False
         return qs[offset:offset+settings.POSTS_ON_PAGE]
@@ -127,7 +127,7 @@ class AuthorView(AJAXLoadListView):
 
     def get_queryset(self):
         offset = int(self.request.GET.get('offset', 0))
-        self.author = get_object_or_404(User, id=self.args[0])
+        self.author = get_object_or_404(User, id=self.kwargs.get('pk'))
         qs = Post.objects.filter(author=self.author.id).order_by('-created')
         self.load_flag = True if qs.count() > (offset + settings.POSTS_ON_PAGE) else False
         return qs[offset:offset+settings.POSTS_ON_PAGE]
