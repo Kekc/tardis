@@ -2,6 +2,7 @@
 
 from django.core.urlresolvers import reverse
 from django import template
+from django.conf import settings
 
 from blog.models import Post
 
@@ -35,6 +36,7 @@ def navigation(context):
     else:
         items.extend([signup_item, signin_item])
     data['items'] = items
+    data['search_url'] = reverse(settings.SEARCH_ENGINE)
     return data
 
 @register.inclusion_tag('post.html', takes_context=True)

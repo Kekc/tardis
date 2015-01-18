@@ -1,0 +1,40 @@
+{% extends "index.html" %}
+{% load blog_widgets %}
+{% block title %}
+haystack search
+{% endblock title %}
+
+{% block current_page %}
+    <div class="panel panel-default">
+		<div class="panel-body">
+			Searching: "{{ query }}"
+		</div>
+	</div>
+{% endblock current_page %}
+
+{% block content %}
+	<div>
+		{% if page.object_list %}
+			<div class="posts">
+				{% include "post_tpl.html" %}
+				{% for result in page.object_list %}
+					{% post_template result.object.id %}
+				{% endfor %}
+			</div>
+			{% if load_flag %}
+				<span id="post-load-button" class="btn btn-default pull-right" data-offset="0" onclick="load_posts({{ ajax_data }});">Show more</span>
+			{% endif %}
+
+		{% else %}
+			<div class="panel panel-default">
+				<div class="panel-body">
+					{% if index_flag %}
+						No posts yet
+					{% else %}
+						Nothing is found, try <a href="{% url 'index' %}">home page</a>
+					{% endif %}
+				</div>
+			</div>
+		{% endif %}
+	</div>
+{% endblock content %}

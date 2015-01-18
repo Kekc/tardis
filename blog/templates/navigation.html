@@ -8,11 +8,12 @@
 					<li>
 						<a href="{{ item.link }}">{{ item.name }}</a>
 					</li>
+
 				{% endfor %}
 			</ul>
-			<form action="{% url 'search' %}" class="navbar-form navbar-left" role="search" id="form-search">
+			<form action="{{ search_url }}" class="navbar-form navbar-left" role="search" id="form-search">
 				<div class="form-group">
-					<input type="text" class="form-control"  name="query" id="form-search-input">
+					<input type="text" class="form-control"  name="q" id="form-search-input">
 				</div>
 				<button type="submit" class="btn btn-default" id="form-search-submit">
 					<span class="glyphicon glyphicon-search"></span>

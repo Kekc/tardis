@@ -114,7 +114,6 @@ class CategoryView(AJAXLoadListView):
 
     def get_context_data(self, **kwargs):
         data = {
-            'index_flag': False,
             'load_url': reverse('category', args=(self.category.id,)),
             'category': self.category.id,
         }
@@ -136,7 +135,6 @@ class AuthorView(AJAXLoadListView):
 
     def get_context_data(self, **kwargs):
         data = {
-            'index_flag': False,
             'load_url': reverse('author', args=(self.author.id,)),
             'author': self.author.id,
         }
@@ -151,7 +149,7 @@ class SearchView(AJAXLoadListView):
 
     def get_queryset(self):
         offset = int(self.request.GET.get('offset', 0))
-        self.query = self.request.GET.get('query')
+        self.query = self.request.GET.get('q')
         qs = []
         if self.query:
             query = self.query.strip().split(' ')
@@ -163,13 +161,12 @@ class SearchView(AJAXLoadListView):
         else:
             self.query = ''
 
-        self.load_flag = True if qs.count() > (offset + settings.POSTS_ON_PAGE) else False
+        self.load_flag = True if (qs and qs.count()) > (offset + settings.POSTS_ON_PAGE) else False
         return qs[offset:offset+settings.POSTS_ON_PAGE]
 
     def get_context_data(self, **kwargs):
         data = {
-            'index_flag': False,
-            'load_url': reverse('search')+'?%s' % self.query,
+            'load_url': reverse('basic_search')+'?%s' % self.query,
             'query': self.query,
         }
         context = super(SearchView, self).get_context_data(**data)

@@ -2,3 +2,4 @@ Django==1.7.3
 django-crispy-forms==1.4.0
 pip==6.0.6
 setuptools==11.0
+django-haystack==2.3.1
