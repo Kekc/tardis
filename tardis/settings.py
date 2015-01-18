@@ -18,6 +18,7 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'crispy_forms',
+    'haystack',
     'blog',
 )
 
@@ -33,7 +34,7 @@ MIDDLEWARE_CLASSES = (
 
 TEMPLATE_CONTEXT_PROCESSORS = (
     'django.core.context_processors.request',
-    'django.contrib.auth.context_processors.auth'
+    'django.contrib.auth.context_processors.auth',
 )
 
 ROOT_URLCONF = 'tardis.urls'
@@ -67,4 +68,17 @@ STATIC_URL = '/static/'
 
 LOGIN_URL = '/login/'
 
+POSTS_ON_PAGE = 3
+
 CRISPY_TEMPLATE_PACK = 'bootstrap3'
+
+HAYSTACK_CONNECTIONS = {
+    'default': {
+        'ENGINE': 'haystack.backends.solr_backend.SolrEngine',
+        'URL': 'http://127.0.0.1:8983/solr'
+
+    },
+}
+
+# SEARCH_ENGINE = 'basic_search'
+SEARCH_ENGINE = 'haystack_search'
